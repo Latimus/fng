@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "experimentalDecorators": true,
+        "types": [
+            "mocha"
+        ],
+        "typeRoots": [
+            "../../node_modules/@types"
+        ],
+        "lib": [
+            "dom",
+            "dom.iterable",
+            "esnext"        ],
+        "module": "commonjs",
+        "target": "es6",
+        "esModuleInterop": true
+    }
+}
