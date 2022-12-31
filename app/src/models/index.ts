@@ -34,3 +34,16 @@ export type DateValue = {
     date: Dayjs;
     dateString: string;
 }
+
+export type FngData = {
+    name?: string,
+    data?: [{
+        value: string,
+        value_classification: string,
+        timestamp: string,
+        time_until_update: string,
+    }],
+    metadata?:  {
+        error: string,
+    }
+}

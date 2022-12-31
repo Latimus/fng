@@ -4,12 +4,13 @@ import { Box, Stack } from '@mui/system';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { alertAction, setPlayer } from '../redux/actions';
+import { alertAction, setGame, setPlayer } from '../redux/actions';
 import { IState } from '../redux/reducers';
 import { newBetSC } from '../sc/new_bet';
 import PriceCheckIcon from '@mui/icons-material/PriceCheck';
 import { getPlayer } from '../sc/get_player';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { getGame } from '../sc/get_game';
 
 const NewBet = () => {
     const state = useSelector((state: IState) => state);
@@ -49,10 +50,12 @@ const NewBet = () => {
                 state.game,
             ).catch((err) => {
                 dispatch(alertAction({ open: true, severity: 'error', message: err.message, title: 'ERROR' }));
+                setLoading(false);
             }).then(async (trx) => {
                 setSuccess(true);
-                await getPlayer(wallet, connection).then((player) => { dispatch(setPlayer(player)) });
-                dispatch(alertAction({ open: true, severity: 'success', message: `trx: ${trx}`, title: 'sended' }));
+                await getPlayer(wallet, connection).then(player => dispatch(setPlayer(player)));
+                await getGame(wallet, connection, +(state.dateValue.dateString)).then(game => dispatch(setGame(game)));
+                dispatch(alertAction({ open: true, severity: 'success', message: `https://explorer.solana.com/tx/${trx}`, title: 'sended' }));
             });
             setLoading(false);
         }

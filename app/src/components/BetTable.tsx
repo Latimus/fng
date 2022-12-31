@@ -83,7 +83,10 @@ const DenseTable = () => {
             fetchData(wallet, connection, +(state.dateValue.dateString)).catch(console.error);
         }
     }, [wallet, state.dateValue]);
-
+    React.useEffect(() => {
+        setGetResult(state.player.playerBets.filter(x => x.day && x.day < parseInt(dayjs().format('YYYYMMDD'))));
+        setCurrentBet(state.player.playerBets.filter(x => x.day && x.day === +(state.dateValue.dateString)));
+    }, [state.player]);
     React.useEffect(() => {
         let r: Rating[] = [];
         let totalBet = 0;
@@ -96,10 +99,7 @@ const DenseTable = () => {
         })
         setRows(r);
     }, [state.game, state.player])
-    React.useEffect(() => {
-        setGetResult(state.player.playerBets.filter(x => x.day && x.day < parseInt(dayjs().format('YYYYMMDD'))));
-        setCurrentBet(state.player.playerBets.filter(x => x.day && x.day === +(state.dateValue.dateString)));
-    }, [state.player]);
+
 
     return (
         <>

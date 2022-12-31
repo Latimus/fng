@@ -10,11 +10,11 @@ import {Fng} from './idl/fng';
 
 
 (async () => {
-    // const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
-    const connection = new Connection("http://127.0.0.1:8899", "confirmed");
+    const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+    // const connection = new Connection("http://127.0.0.1:8899", "confirmed");
     const program = anchor.workspace.Fng as Program<Fng>;
     const payer = Keypair.fromSecretKey(bs58.decode(secret.BOB_SECRET_KEY));
-    const fng_date = 20221220;
+    const fng_date = 20230101;
 
 
     const [game_pda, _game_pda_bump] = await PublicKey.findProgramAddress(
@@ -24,16 +24,7 @@ import {Fng} from './idl/fng';
 
     console.log('game_pda', game_pda.toBase58());
 
-    class Assignable {
-        constructor(properties) {
-            Object.keys(properties).map((key) => {
-                return (this[key] = properties[key]);
-            });
-        }
-    }
 
-    class Payload extends Assignable {
-    }
     class Primitive extends Struct {
         constructor(properties) {
             super(properties);

@@ -1,5 +1,4 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import { PhantomWalletAdapter, SlopeWalletAdapter, SolflareWalletAdapter, LedgerWalletAdapter, SolletWalletAdapter, SolletExtensionWalletAdapter } from '@solana/wallet-adapter-wallets';
@@ -10,14 +9,16 @@ import Menu from './components/menu';
 import Sweeper from './components/sweeper';
 import { Container } from '@mui/material';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
+import { clusterApiUrl } from '@solana/web3.js';
+import FngChart from './components/fng_chart';
 
 function App() {
   // Can be set to 'devnet', 'testnet', or 'mainnet-beta'
   const network = WalletAdapterNetwork.Devnet;
 
   // You can also provide a custom RPC endpoint
-  const endpoint = React.useMemo(() => "http://127.0.0.1:8899", [network]);
-  // const endpoint = React.useMemo(() => clusterApiUrl(network), [network]);
+  // const endpoint = React.useMemo(() => "http://127.0.0.1:8899", [network]);
+  const endpoint = React.useMemo(() => clusterApiUrl(network), [network]);
 
   const wallets = React.useMemo(
     () => [
@@ -39,10 +40,9 @@ function App() {
             <Menu />
             <div className={"gradient-lottery"}>
               <Container maxWidth={'lg'}>
-                {/*<div className={"center width70"}>*/}
                 <Sweeper />
+                <FngChart />
                 <FAQ />
-                {/*</div>*/}
               </Container>
               <Footer />
             </div>

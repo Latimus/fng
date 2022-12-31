@@ -1,18 +1,19 @@
 import secret from '/home/chavers/solana/wallet/secret';
 
 // import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import {clusterApiUrl, Connection, Keypair, PublicKey, Transaction} from '@solana/web3.js';
-import {deserializeUnchecked} from 'borsh';
+import { clusterApiUrl, Connection, Keypair, PublicKey, Transaction } from '@solana/web3.js';
+import { deserializeUnchecked } from 'borsh';
 
-import {bs58, utf8} from "@project-serum/anchor/dist/cjs/utils/bytes";
+import { bs58, utf8 } from "@project-serum/anchor/dist/cjs/utils/bytes";
 import * as anchor from '@project-serum/anchor';
-import {Program} from '@project-serum/anchor';
+import { Program } from '@project-serum/anchor';
 import NodeWallet from '@project-serum/anchor/dist/cjs/nodewallet';
-import {Fng} from './idl/fng';
+import { Fng } from './idl/fng';
 
 
 (async () => {
-    const connection = new Connection("http://127.0.0.1:8899", "confirmed");
+    const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+    // const connection = new Connection("http://127.0.0.1:8899", "confirmed");
     const payer = Keypair.fromSecretKey(bs58.decode(secret.FNG_ADMIN_SECRET_KEY));
     const options = anchor.AnchorProvider.defaultOptions();
     const wallet = new NodeWallet(payer);
@@ -42,14 +43,14 @@ import {Fng} from './idl/fng';
 
     let initATAtx = new Transaction();
     initATAtx.add(program.instruction.configFng({
-            accounts: {
-                payer: payer.publicKey,
-                oracle: new PublicKey(secret.FNG_ORACLE_PUBLIC_KEY),
-                configPda: config_account,
-                systemProgram: anchor.web3.SystemProgram.programId,
-                rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-            }
+        accounts: {
+            payer: payer.publicKey,
+            oracle: new PublicKey(secret.FNG_ORACLE_PUBLIC_KEY),
+            configPda: config_account,
+            systemProgram: anchor.web3.SystemProgram.programId,
+            rent: anchor.web3.SYSVAR_RENT_PUBKEY,
         }
+    }
     ));
 
     if (initATAtx.instructions.length > 0) {
@@ -79,7 +80,7 @@ import {Fng} from './idl/fng';
     ]);
     await connection.getAccountInfo(config_account)
         .then((account) => {
-            let accountInfo = deserializeUnchecked(ConfigPdaDS,ConfigPda, account.data);
+            let accountInfo = deserializeUnchecked(ConfigPdaDS, ConfigPda, account.data);
             console.log("admin", bs58.encode(accountInfo['owner_account']));
             console.log('oracle:', bs58.encode(accountInfo['oracle_account']));
         })
