@@ -11,7 +11,7 @@ const Sweeper: FC = props => {
             <div style={{ height: "100px" }}></div>
             <div className={"prize-border"}>
                 <Grid container direction="row" justifyContent="center"
-                    alignItems="center">
+                    alignItems="stretch">
                     <Grid xs={12} md={6} style={{
                         padding: '35px',
                     }}>
