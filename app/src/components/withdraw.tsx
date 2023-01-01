@@ -31,7 +31,7 @@ const Withdraw = () => {
     };
 
     React.useEffect(() => {
-        setGetResult(state.player.playerBets.filter(x => x.day && x.day < +(dayjs().format('YYYYMMDD'))));
+        setGetResult(state.player.playerBets.filter(x => x.day && x.day <= +(dayjs().format('YYYYMMDD'))));
     }, [state.player]);
 
     const sendWithdraw = async () => {

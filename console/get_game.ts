@@ -14,7 +14,7 @@ import {Fng} from './idl/fng';
     // const connection = new Connection("http://127.0.0.1:8899", "confirmed");
     const program = anchor.workspace.Fng as Program<Fng>;
     const payer = Keypair.fromSecretKey(bs58.decode(secret.BOB_SECRET_KEY));
-    const fng_date = 20230101;
+    const fng_date = 20221231;
 
 
     const [game_pda, _game_pda_bump] = await PublicKey.findProgramAddress(

@@ -14,11 +14,11 @@ import FngChart from './components/fng_chart';
 
 function App() {
   // Can be set to 'devnet', 'testnet', or 'mainnet-beta'
-  const network = WalletAdapterNetwork.Devnet;
+  const network = WalletAdapterNetwork.Mainnet;
 
   // You can also provide a custom RPC endpoint
-  // const endpoint = React.useMemo(() => "http://127.0.0.1:8899", [network]);
-  const endpoint = React.useMemo(() => clusterApiUrl(network), [network]);
+  const endpoint = React.useMemo(() => "https://rpc.ankr.com/solana", [network]);
+  // const endpoint = React.useMemo(() => clusterApiUrl(network), [network]);
 
   const wallets = React.useMemo(
     () => [
@@ -26,7 +26,7 @@ function App() {
       new PhantomWalletAdapter(),
       new SlopeWalletAdapter(),
       new SolflareWalletAdapter(),
-      // new LedgerWalletAdapter(),
+      new LedgerWalletAdapter(),
       new SolletWalletAdapter({ network }),
       new SolletExtensionWalletAdapter({ network }),
     ],

@@ -12,7 +12,7 @@ import { Fng } from './idl/fng';
 
 
 (async () => {
-    const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+    const connection = new Connection(clusterApiUrl("mainnet-beta"), "confirmed");
     // const connection = new Connection("http://127.0.0.1:8899", "confirmed");
     const payer = Keypair.fromSecretKey(bs58.decode(secret.FNG_ADMIN_SECRET_KEY));
     const options = anchor.AnchorProvider.defaultOptions();

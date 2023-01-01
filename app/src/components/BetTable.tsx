@@ -12,13 +12,14 @@ import {
 import { getPlayer } from '../sc/get_player';
 import { Connection } from '@solana/web3.js';
 import { getGame } from '../sc/get_game';
-import { Paper, Box, Grid, TextField } from '@mui/material';
+import { Paper, Box, Grid, TextField, CircularProgress } from '@mui/material';
 import { Bets, Rating } from '../models';
 import { dateAction, setGame, setPlayer } from '../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { IState } from '../redux/reducers';
 import NewBet from './new_bet';
 import Withdraw from './withdraw';
+import { green } from '@mui/material/colors';
 
 const DenseTable = () => {
     const columns: GridColDef[] = [
@@ -48,7 +49,6 @@ const DenseTable = () => {
     const handleChange = (newValue: Dayjs | null) => {
         if (newValue) {
             dispatch(dateAction({ date: newValue, dateString: newValue.format('YYYYMMDD') }));
-
         }
     };
     const beted = (params: GridRowClassNameParams) => {
@@ -59,34 +59,53 @@ const DenseTable = () => {
         }
         return '';
     }
-    const [getResult, setGetResult] = React.useState<Bets[]>([]);
+    const [playerLoading, setPlayerLoading] = React.useState(false);
+    const [gameLoading, setGameLoading] = React.useState(false);
+    const [pastBet, setPastBet] = React.useState<Bets[]>([]);
     const [currentBet, setCurrentBet] = React.useState<Bets[]>([]);
     const [currentDate, setCurrentDate] = React.useState<number>(+(dayjs().format('YYYYMMDD')));
     const [rows, setRows] = React.useState<Rating[]>([]);
 
     React.useEffect(() => {
         const fetchData = async (wallet: AnchorWallet, connection: Connection, fng_date: Number) => {
-
+            setPlayerLoading(true);
             await getPlayer(wallet, connection).then((player) => {
-                const bets = player.playerBets.filter(x => x.day && x.day < parseInt(dayjs().format('YYYYMMDD')));
-                if (bets.length > 0 && state.dateValue.dateString !== bets[0].day.toString()) {
-                    dispatch(dateAction({ date: dayjs(bets[0].day.toString()), dateString: bets[0].day.toString() }));
-                } else {
-                    dispatch(setPlayer(player));
-                }
+                dispatch(setPlayer(player));
             });
-            await getGame(wallet, connection, fng_date).then((game) => {
-                dispatch(setGame(game));
-            });
+            setPlayerLoading(false);
         }
         if (wallet && wallet.publicKey) {
             fetchData(wallet, connection, +(state.dateValue.dateString)).catch(console.error);
         }
-    }, [wallet, state.dateValue]);
+    }, [wallet]);
+
     React.useEffect(() => {
-        setGetResult(state.player.playerBets.filter(x => x.day && x.day < parseInt(dayjs().format('YYYYMMDD'))));
-        setCurrentBet(state.player.playerBets.filter(x => x.day && x.day === +(state.dateValue.dateString)));
+        const fetchData = async (wallet: AnchorWallet, connection: Connection, fng_date: Number) => {
+            setGameLoading(true);
+            await getGame(wallet, connection, fng_date).then((game) => {
+                dispatch(setGame(game));
+            });
+            setGameLoading(false);
+        }
+        if (wallet && wallet.publicKey) {
+            fetchData(wallet, connection, +(state.dateValue.dateString)).catch(console.error);
+            setCurrentBet(state.player.playerBets.filter(x => x.day && x.day === +(state.dateValue.dateString)));
+        }
+    }, [state.dateValue]);
+
+
+    React.useEffect(() => {
+        if (wallet && wallet.publicKey) {
+            const bets = state.player.playerBets.filter(x => x.day && x.day <= currentDate);
+            setPastBet(bets);
+            if (wallet && bets.length > 0) {
+                dispatch(dateAction({ date: dayjs(bets[0].day.toString(), { format: 'YYYMMDD', utc: true }), dateString: bets[0].day.toString() }))
+            } else {
+                dispatch(dateAction({ date: dayjs().add(1, 'day'), dateString: dayjs().add(1, 'day').format('YYYYMMDD') }));
+            }
+        }
     }, [state.player]);
+
     React.useEffect(() => {
         let r: Rating[] = [];
         let totalBet = 0;
@@ -98,16 +117,15 @@ const DenseTable = () => {
             })
         })
         setRows(r);
-    }, [state.game, state.player])
+    }, [state.game])
 
 
     return (
         <>
             <div>
-                <Grid container spacing={2}>
+                <Grid container spacing={1}>
                     <Grid item xs />
                     <Grid item xs={4}>
-                        <h2 style={{ color: '#fff' }}>Place your bets !</h2>
                         <Paper elevation={3} >
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DesktopDatePicker
@@ -127,7 +145,7 @@ const DenseTable = () => {
                 <Grid container spacing={2}>
                     <Grid item xs={12} md={12}>
                         <Paper elevation={3}>
-                            <div style={{ height: 275 }}>
+                            <Box sx={{ height: 275, position: 'relative' }}>
                                 <DataGrid
                                     rows={rows}
                                     columns={columns}
@@ -140,8 +158,20 @@ const DenseTable = () => {
                                     getRowClassName={(params) => beted(params)}
 
                                 />
-
-                            </div>
+                                {(playerLoading || gameLoading) && (
+                                    <CircularProgress
+                                        size={48}
+                                        sx={{
+                                            color: green[500],
+                                            position: 'absolute',
+                                            top: '50%',
+                                            left: '50%',
+                                            marginTop: '-12px',
+                                            marginLeft: '-12px',
+                                        }}
+                                    />
+                                )}
+                            </Box>
                         </Paper>
                     </Grid>
                     <Grid item xs={12} md={12}>
@@ -152,15 +182,19 @@ const DenseTable = () => {
                             </Box>
                         }
                         {
-                            wallet && getResult.length === 0 && currentBet.length === 0 && +(state.dateValue.dateString) > currentDate &&
+                            wallet && pastBet.length === 0 && currentBet.length === 0 && +(state.dateValue.dateString) > currentDate &&
                             <NewBet />
                         }
                         {
-                            wallet && getResult.length > 0 &&
+                            wallet && pastBet.length === 0 && currentBet.length === 1 && +(state.dateValue.dateString) > currentDate &&
+                            <h3>You already have a bet for this day, take another to play.</h3>
+                        }
+                        {
+                            wallet && pastBet.length > 0 &&
                             <Withdraw />
                         }
                         {
-                            wallet && getResult.length === 0 && +(state.dateValue.dateString) <= currentDate &&
+                            wallet && pastBet.length === 0 && +(state.dateValue.dateString) <= currentDate &&
                             <h3>No pending result. Pickup a future's date to play.</h3>
                         }
                     </Grid>

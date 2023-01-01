@@ -11,7 +11,7 @@ export interface IState {
 }
 const initState: IState = {
     snackAlert: { open: false, severity: 'success', message: "", title: "" },
-    dateValue: { date: dayjs().add(1, 'day'), dateString: dayjs().add(1, 'day').format('YYYYMMDD') },
+    dateValue: { date: dayjs(), dateString: dayjs().format('YYYYMMDD') },
     game: { betCount: 0, oracle: -1, bump: 0, bets: [], pda: '' },
     player: { bump: 0, betCount: 0, pda: '', playerBets: [] },
 }

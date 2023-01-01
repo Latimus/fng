@@ -39,7 +39,7 @@ export const withdrawSC = async (
     const addInstruction = async () => {
         return Promise.all(
             player.playerBets.map(async (bet) => {
-                if (today > bet.day) {
+                if (today >= bet.day) {
                     const game_pda = getPDA(`game${bet.day}`);
                     initATAtx.add(await program.methods
                         .withdraw(bet.day)

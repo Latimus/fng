@@ -19,8 +19,8 @@ import {Fng} from './idl/fng';
 import {TOKEN_PROGRAM_ID} from "@solana/spl-token";
 
 (async () => {
-    // const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
-    const connection = new Connection("http://127.0.0.1:8899", "confirmed");
+    const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+    // const connection = new Connection("http://127.0.0.1:8899", "confirmed");
     const payer = Keypair.fromSecretKey(bs58.decode(secret.FNG_ORACLE_SECRET_KEY));
 
     const options = anchor.AnchorProvider.defaultOptions();
@@ -28,7 +28,7 @@ import {TOKEN_PROGRAM_ID} from "@solana/spl-token";
     const provider = new anchor.AnchorProvider(connection, wallet, options);
     anchor.setProvider(provider);
     const program = anchor.workspace.Fng as Program<Fng>;
-    const fng_date = 20221220;
+    const fng_date = 20230101;
     console.log("programId:", program.programId.toBase58());
 
 
